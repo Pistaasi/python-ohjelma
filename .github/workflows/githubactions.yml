@@ -10,27 +10,23 @@ on:
     branches: [ main ]
 
 jobs:
-  test:
+  run:
     runs-on: ubuntu-latest
+    env:
+      OS: ubuntu-latest
+      PYTHON: '3.9'
     steps:
-    - uses: actions/checkout@v2
-    - uses: actions/setup-python@v1
-
-    - name: Unit tests
-      run: make test
-
-    - name: Coveralls
-      uses: AndreMiras/coveralls-python-action@develop
+    - uses: checkout@v2
       with:
-        parallel: true
-        flag-name: Unit Test
-        
-  coveralls_finish:
-    needs: test
-    runs-on: ubuntu-latest
-    steps:
-    - name: Coveralls Finished
-      uses: AndreMiras/coveralls-python-action@develop
+        fetch-depth: ‘2’
+
+    - name: Setup Python
+      uses: actions/setup-python@master
       with:
-        parallel-finished: true
-        
+        python-version: 3.7
+    - name: Generate Report
+      run: |
+        pip install coverage
+        coverage run -m postinumerot_test
+        coverage report
+ 
