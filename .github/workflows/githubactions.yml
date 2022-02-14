@@ -1,6 +1,3 @@
-# This workflow will install Python dependencies, run tests and lint with a single version of Python
-# For more information see: https://help.github.com/actions/language-and-framework-guides/using-python-with-github-actions
-
 name: Python application
 
 on:
@@ -10,23 +7,26 @@ on:
     branches: [ main ]
 
 jobs:
-  run:
+  test:
     runs-on: ubuntu-latest
-    env:
-      OS: ubuntu-latest
-      PYTHON: '3.9'
     steps:
-    - uses: checkout@v2
-      with:
-        fetch-depth: ‘2’
+    - uses: actions/checkout@v2
+    - uses: actions/setup-python@v1
 
-    - name: Setup Python
-      uses: actions/setup-python@master
+    - name: Unit tests
+      run: make test
+
+    - name: Coveralls
+      uses: AndreMiras/coveralls-python-action@develop
       with:
-        python-version: 3.7
-    - name: Generate Report
-      run: |
-        pip install coverage
-        coverage run -m postinumerot_test
-        coverage report
- 
+        parallel: true
+        flag-name: Unit Test
+        
+  coveralls_finish:
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+    - name: Coveralls Finished
+      uses: AndreMiras/coveralls-python-action@develop
+      with:
+        parallel-finished: true
